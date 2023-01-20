@@ -1,13 +1,13 @@
 import { actionDispatcher } from './action-dispatcher';
 import { parseCommand } from './command-parser';
 import { CustomError } from './errors';
-import { Action } from './models';
+import { Action, CommandKey } from './models';
 
 export const commandHandler = async (msg: string): Promise<string> => {
-  let action: Action;
+  let action: Action<CommandKey>;
 
   try {
-    action = parseCommand(msg);
+    action = await parseCommand(msg);
   } catch (e) {
     if (e instanceof CustomError) {
       return e.message;
@@ -16,5 +16,12 @@ export const commandHandler = async (msg: string): Promise<string> => {
     throw e;
   }
 
-  return actionDispatcher(action)
+  let commandResult = action.command;
+  const actionResult = await actionDispatcher(action);
+
+  if (actionResult) {
+    commandResult += ' ' + actionResult;
+  }
+
+  return commandResult;
 };
