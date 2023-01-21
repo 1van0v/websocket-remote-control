@@ -1,6 +1,7 @@
 import { mouse, Point } from '@nut-tree/nut-js';
 
 import { Action, ActionHandler, CommandKey, MouseAction, MouseCommand, MouseCommandKey, PathGetter } from '../models';
+import { handleAction } from './common.handler';
 
 const moveMouse = async (action: Action<CommandKey>, getPath: PathGetter) => {
   const offset = action.args[0];
@@ -11,7 +12,7 @@ const moveMouse = async (action: Action<CommandKey>, getPath: PathGetter) => {
 
 const getMousePosition = async (action: MouseAction): Promise<string> => {
   const { x, y } = action.cursor;
-  return `${action.command} ${x}px,${y}px`;
+  return `${x}px,${y}px`;
 };
 
 const moveMouseUp = async (action: MouseAction): Promise<string> => {
@@ -39,7 +40,5 @@ const handlerMap: Record<MouseCommandKey, ActionHandler<MouseCommandKey>> = {
 };
 
 export const handleMouseAction: ActionHandler<MouseCommandKey> = (action: MouseAction): Promise<string> => {
-  const handler = handlerMap[action.command];
-
-  return handler(action);
+  return handleAction(handlerMap, action);
 };

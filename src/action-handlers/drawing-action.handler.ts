@@ -1,6 +1,7 @@
 import { mouse, Point } from '@nut-tree/nut-js';
 import { ActionData, ActionHandler, DrawingAction, DrawingCommand, DrawingCommandKey, PathGetter } from '../models';
 import { Position } from '../models/position.model';
+import { handleAction } from './common.handler';
 
 const dragMouse = async (action: DrawingAction, getPath: PathGetter): Promise<void> => {
   const points = getPath(action).map(({ x, y }) => new Point(x, y));
@@ -72,7 +73,9 @@ const drawCircle = async (action: DrawingAction): Promise<string> => {
 
 const drawSquare = async (action: DrawingAction): Promise<string> => {
   await dragMouse(action, getRectanglePath);
-  return action.args[0]?.toString();
+  const [width, height] = action.args;
+
+  return height ? width + ' ' + height : width.toString();
 };
 
 const handlerMap: Record<DrawingCommandKey, ActionHandler<DrawingCommandKey>> = {
@@ -82,7 +85,5 @@ const handlerMap: Record<DrawingCommandKey, ActionHandler<DrawingCommandKey>> = 
 };
 
 export const handleDrawingAction = (action: DrawingAction): Promise<string> => {
-  const handler = handlerMap[action.command];
-
-  return handler(action);
+  return handleAction(handlerMap, action);
 };
