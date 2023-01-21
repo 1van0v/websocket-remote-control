@@ -42,9 +42,9 @@ const getRectanglePath = (action: ActionData): Position[] => {
 
   const points: Position[] = getLine([action.cursor], 'x', width);
 
-  points.push(...getLine(points, 'y', -actualHeight));
-  points.push(...getLine(points, 'x', -width));
   points.push(...getLine(points, 'y', actualHeight));
+  points.push(...getLine(points, 'x', -width));
+  points.push(...getLine(points, 'y', -actualHeight));
 
   return points;
 };

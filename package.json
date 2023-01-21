@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start:dev": "nodemon ./src/server.ts",
-    "start:prod": "npm run build && node ./dist/app.js",
+    "start:prod": "npm run build && node ./dist/server.js",
     "lint": "eslint ./src/ --fix && prettier --write"
   },
   "repository": {
