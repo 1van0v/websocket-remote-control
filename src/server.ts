@@ -1,4 +1,5 @@
 import { Transform } from 'stream';
+import { IncomingMessage } from 'http';
 
 import WebSocket, { createWebSocketStream, WebSocketServer } from 'ws';
 import dotenv from 'dotenv';
@@ -15,9 +16,9 @@ const messageHandler = new Transform({
     const msg = chunk.toString();
     console.log('<-', chunk);
     commandHandler(msg)
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
-        return 'Something terribly wrong has happened. Please try again.'
+        return 'Something terribly wrong has happened. Please try again.';
       })
       .then((res) => {
         console.log('->', res);
@@ -30,7 +31,24 @@ const messageHandler = new Transform({
   encoding: 'utf-8',
 });
 
-wss.on('connection', (ws: WebSocket) => {
+wss.on('listening', () => console.log('Web Socket Server is listening on', port));
+
+wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
+  const { remoteAddress, remotePort } = req.socket;
+  console.log('Established connection from', `${remoteAddress}:${remotePort}`);
   const wsDuplex = createWebSocketStream(ws, { readableObjectMode: true, decodeStrings: false });
   wsDuplex.pipe(messageHandler).pipe(wsDuplex);
+});
+
+process.once('SIGINT', () => {
+  let closedConnections = 0;
+
+  console.log('\nShutting down web socket server');
+  wss.close(() => console.log('Web Socket Server was shuted down'));
+
+  wss.clients.forEach((i) => {
+    closedConnections++;
+    i.close();
+  });
+  console.log('closed', closedConnections, 'connections');
 });

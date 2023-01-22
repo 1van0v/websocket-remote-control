@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "start": "npm run start:dev",
     "start:dev": "nodemon ./src/server.ts",
     "start:prod": "npm run build && node ./dist/server.js",
     "lint": "eslint ./src/ --fix && prettier --write"
